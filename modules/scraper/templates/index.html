@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scraper-UI 采集工作台</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/static/workbench.css?v=20260624-8">
+    {% if request.args.get('embedded') == '1' %}
+    <style>
+      .sidebar, .topbar, .mobile-nav { display: none !important; }
+      .app-shell { display: block; min-height: 0; }
+      .main { margin: 0; padding: 16px; min-width: 0; }
+      body { background: #fff; }
+    </style>
+    {% endif %}
+</head>
+<body>
+<div class="app-shell">
+    <aside class="sidebar" aria-label="主导航">
+        <div class="brand">
+            <div class="brand-mark">S</div>
+            <div>
+                <div class="brand-title">Scraper-UI</div>
+                <div class="brand-subtitle">本地采集工作台</div>
+            </div>
+        </div>
+
+        <nav class="nav-list">
+            <button class="nav-item active" data-view="overview"><i class="fa-solid fa-gauge"></i><span>总览</span></button>
+            <button class="nav-item" data-view="quick"><i class="fa-solid fa-bolt"></i><span>快速抓取</span></button>
+            <button class="nav-item" data-view="crawler"><i class="fa-solid fa-mobile-screen"></i><span>商品采集</span></button>
+            <button class="nav-item" data-view="search"><i class="fa-solid fa-magnifying-glass-chart"></i><span>网页搜索</span></button>
+            <button class="nav-item" data-view="competitor"><i class="fa-solid fa-binoculars"></i><span>竞品采集</span></button>
+            <button class="nav-item" data-view="video"><i class="fa-solid fa-video"></i><span>视频下载</span></button>
+            <button class="nav-item" data-view="merchant"><i class="fa-solid fa-store"></i><span>商家后台</span></button>
+            <button class="nav-item" data-view="media"><i class="fa-solid fa-network-wired"></i><span>媒体采集</span></button>
+            <button class="nav-item" data-view="results"><i class="fa-solid fa-table"></i><span>结果库</span></button>
+            <button class="nav-item" data-view="settings"><i class="fa-solid fa-sliders"></i><span>设置</span></button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="mini-label">当前服务</div>
+            <div class="mini-status" id="sideServiceStatus">检测中</div>
+        </div>
+    </aside>
+
+    <main class="main">
+        <header class="topbar">
+            <div>
+                <h1 id="viewTitle">总览</h1>
+                <p id="viewSubtitle">环境状态、最近任务和结果入口。</p>
+            </div>
+            <div class="status-strip" id="statusStrip">
+                <span class="status-chip neutral">环境 检测中</span>
+                <span class="status-chip neutral">ADB 检测中</span>
+                <span class="status-chip neutral">设备 检测中</span>
+                <span class="status-chip neutral">输出目录 检测中</span>
+            </div>
+        </header>
+
+        <section class="view active" id="view-overview">
+            <div class="dashboard-grid">
+                <section class="panel span-2">
+                    <div class="panel-head">
+                        <div>
+                            <h2>环境状态</h2>
+                            <p>采集前先看这里，阻断项会标黄或标红。</p>
+                        </div>
+                        <button class="btn secondary" id="refreshHealthBtn"><i class="fa-solid fa-rotate"></i>刷新</button>
+                    </div>
+                    <div class="health-grid" id="healthGrid"><div class="empty">正在检测环境...</div></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>Android 设备</h2>
+                        <button class="btn icon" id="refreshDevicesBtn" title="刷新设备"><i class="fa-solid fa-rotate"></i></button>
+                    </div>
+                    <div class="device-summary" id="overviewDeviceSummary"><div class="empty">正在检测 Android 设备...</div></div>
+                </section>
+
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>最近任务</h2>
+                        <button class="btn secondary" data-jump="results">查看结果库</button>
+                    </div>
+                    <div class="compact-list" id="recentHistory"><div class="empty">正在加载最近任务...</div></div>
+                </section>
+
+                <section class="panel span-2">
+                    <div class="panel-head">
+                        <div>
+                            <h2>快捷入口</h2>
+                            <p>根据任务类型进入对应工作流。</p>
+                        </div>
+                    </div>
+                    <div class="quick-actions">
+                        <button class="action-tile" data-jump="crawler"><i class="fa-solid fa-mobile-screen"></i><strong>商品采集</strong><span>真机/模拟器 App 商品数据</span></button>
+                        <button class="action-tile" data-jump="quick"><i class="fa-solid fa-link"></i><strong>快速抓取</strong><span>粘贴链接提取页面内容</span></button>
+                        <button class="action-tile" data-jump="search"><i class="fa-solid fa-magnifying-glass"></i><strong>网页搜索</strong><span>电商网页关键词采集</span></button>
+                        <button class="action-tile" data-jump="competitor"><i class="fa-solid fa-binoculars"></i><strong>竞品采集</strong><span>买家视角采同行商品</span></button>
+                        <button class="action-tile" data-jump="video"><i class="fa-solid fa-video"></i><strong>视频下载</strong><span>抖音公开视频元数据/下载</span></button>
+                        <button class="action-tile" data-jump="merchant"><i class="fa-solid fa-store"></i><strong>商家后台</strong><span>淘宝、千牛、抖店后台</span></button>
+                        <button class="action-tile" data-jump="media"><i class="fa-solid fa-share-nodes"></i><strong>媒体采集</strong><span>小红书、抖音、贴吧等</span></button>
+                    </div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-quick">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>快速抓取</h2>
+                        <button class="btn secondary" id="quickPreviewBtn"><i class="fa-regular fa-eye"></i>预览</button>
+                    </div>
+                    <label class="field">
+                        <span>链接</span>
+                        <textarea id="quickUrl" rows="5" placeholder="粘贴一个或多个链接，换行表示批量"></textarea>
+                    </label>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>平台</span>
+                            <select id="quickPlatform"></select>
+                        </label>
+                        <label class="field">
+                            <span>设备模拟</span>
+                            <select id="quickDevice">
+                                <option value="pc">PC 桌面</option>
+                                <option value="iphone15">iPhone 15 Pro</option>
+                                <option value="android_s24">Samsung S24</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="switch-row">
+                        <label><input type="checkbox" id="quickHuman"> 仿真模式</label>
+                        <label><input type="checkbox" id="quickLogin"> 使用登录会话</label>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn primary" id="quickRunBtn"><i class="fa-solid fa-play"></i>开始抓取</button>
+                        <button class="btn secondary" id="quickBatchBtn"><i class="fa-solid fa-layer-group"></i>批量抓取</button>
+                    </div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>抓取结果</h2>
+                        <button class="btn secondary" id="quickClearBtn">清空</button>
+                    </div>
+                    <div id="quickResult" class="result-surface empty">等待抓取结果</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-crawler">
+            <div class="workspace crawler-layout">
+                <section class="panel setup-panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>商品采集</h2>
+                            <p>按平台、设备、关键词配置一次 App 采集任务。</p>
+                        </div>
+                    </div>
+                    <div class="segmented" id="crawlerPlatformSelector">
+                        <button class="selected" data-platform="douyin">抖音</button>
+                        <button data-platform="kuaishou">快手</button>
+                        <button data-platform="xhs">小红书</button>
+                    </div>
+                    <label class="field">
+                        <span>搜索关键词</span>
+                        <input type="text" id="crawlerKeyword" placeholder="例如：手机壳">
+                    </label>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>采集页数</span>
+                            <input type="number" id="crawlerPages" value="3" min="1" max="20">
+                        </label>
+                        <label class="field">
+                            <span>采集模式</span>
+                            <select id="crawlerMode">
+                                <option value="ui">UI 可见文本</option>
+                                <option value="api" disabled>API 拦截</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="field">
+                        <span>Android 设备</span>
+                        <div class="inline-control">
+                            <select id="crawlerDeviceSelect"></select>
+                            <button class="btn icon" id="crawlerDeviceRefresh" title="刷新设备"><i class="fa-solid fa-rotate"></i></button>
+                        </div>
+                    </label>
+                    <div class="muted-note" id="crawlerDeviceHint">正在检测 ADB 设备...</div>
+                    <div class="button-row">
+                        <button class="btn secondary" id="crawlerPreflightBtn"><i class="fa-solid fa-stethoscope"></i>运行前检查</button>
+                        <button class="btn primary" id="crawlerStartBtn"><i class="fa-solid fa-play"></i>开始采集</button>
+                        <button class="btn danger hidden" id="crawlerStopBtn"><i class="fa-solid fa-stop"></i>停止</button>
+                    </div>
+                </section>
+
+                <section class="panel preflight-panel">
+                    <div class="panel-head">
+                        <h2>运行前检查</h2>
+                        <span class="panel-status" id="crawlerReadyState">未检查</span>
+                    </div>
+                    <div class="check-list" id="crawlerPreflightBox"></div>
+                    <div class="diagnostic-block">
+                        <h3>处理建议</h3>
+                        <div class="diagnostic-list" id="crawlerDiagnosticBox">
+                            <div class="empty">运行前检查后显示处理建议</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel log-panel">
+                    <div class="panel-head">
+                        <h2>运行日志</h2>
+                        <span class="panel-status" id="crawlerRunState">空闲</span>
+                    </div>
+                    <pre class="log-box" id="crawlerLog">等待操作...</pre>
+                </section>
+
+                <section class="panel results-panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>最近结果</h2>
+                            <p id="crawlerResultInfo">暂无结果</p>
+                        </div>
+                        <button class="btn secondary" id="crawlerResultsBtn"><i class="fa-solid fa-table"></i>刷新结果</button>
+                    </div>
+                    <div id="crawlerResultTable" class="table-wrap empty">暂无数据</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-search">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>网页搜索</h2>
+                    </div>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>平台</span>
+                            <select id="searchPlatform"></select>
+                        </label>
+                        <label class="field">
+                            <span>页数</span>
+                            <input type="number" id="searchPages" value="2" min="1" max="5">
+                        </label>
+                    </div>
+                    <label class="field">
+                        <span>关键词</span>
+                        <input type="text" id="searchKeyword" placeholder="如 air max">
+                    </label>
+                    <div class="switch-row">
+                        <label><input type="checkbox" id="searchHuman"> 仿真模式</label>
+                    </div>
+                    <button class="btn primary" id="searchRunBtn"><i class="fa-solid fa-magnifying-glass"></i>搜索采集</button>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>搜索结果</h2>
+                        <span class="panel-status" id="searchSummary">等待任务</span>
+                    </div>
+                    <div id="searchResult" class="table-wrap empty">暂无数据</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-competitor">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>竞品采集</h2>
+                            <p>买家视角采集公开商品图片、标题文案、价格、店铺和销量信息。</p>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>平台</span>
+                            <select id="competitorPlatform"></select>
+                        </label>
+                        <label class="field">
+                            <span>搜索页数</span>
+                            <input type="number" id="competitorPages" value="1" min="1" max="5">
+                        </label>
+                    </div>
+                    <label class="field">
+                        <span>关键词</span>
+                        <input type="text" id="competitorKeyword" placeholder="例如：眼部精华油、滑板、收纳盒">
+                    </label>
+                    <label class="field">
+                        <span>商品链接</span>
+                        <textarea id="competitorUrls" rows="4" placeholder="可粘贴同行商品详情页链接，多个链接换行"></textarea>
+                    </label>
+                    <div class="switch-row">
+                        <label><input type="checkbox" id="competitorHuman"> 仿真模式</label>
+                        <label><input type="checkbox" id="competitorFetchDetails"> 搜索后补抓详情</label>
+                    </div>
+                    <button class="btn primary" id="competitorRunBtn"><i class="fa-solid fa-play"></i>开始采集</button>
+                    <div class="muted-note">只采集买家页面公开可见信息；遇到登录、验证码或权限提示时需要你手动处理。</div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>竞品结果</h2>
+                            <p id="competitorSummary">等待任务</p>
+                        </div>
+                    </div>
+                    <div id="competitorResult" class="table-wrap empty">暂无数据</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-video">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>抖音视频下载</h2>
+                            <p>采集公开视频标题、作者、封面、来源链接；可选下载到本地。</p>
+                        </div>
+                    </div>
+                    <label class="field">
+                        <span>视频链接</span>
+                        <textarea id="videoUrls" rows="6" placeholder="粘贴抖音视频/分享链接，多个链接换行"></textarea>
+                    </label>
+                    <div class="switch-row">
+                        <label><input type="checkbox" id="videoDownloadFile"> 下载视频文件</label>
+                        <label><input type="checkbox" id="videoHuman"> 仿真模式</label>
+                    </div>
+                    <label class="check-ack">
+                        <input type="checkbox" id="videoConfirmRights">
+                        <span>我确认这些视频属于本人、已获授权，或允许保存的公开内容。</span>
+                    </label>
+                    <button class="btn primary" id="videoRunBtn"><i class="fa-solid fa-download"></i>开始处理</button>
+                    <div class="muted-note">不会去水印，不绕过私密、验证码、付费或风控限制；下载能力依赖本机 yt-dlp。</div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>处理结果</h2>
+                            <p id="videoSummary">等待任务</p>
+                        </div>
+                    </div>
+                    <div id="videoResult" class="table-wrap empty">暂无数据</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-merchant">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>商家后台采集</h2>
+                            <p>用于淘宝卖家、千牛、抖店等登录后后台页面。</p>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>平台</span>
+                            <select id="merchantPlatform"></select>
+                        </label>
+                        <label class="field">
+                            <span>数据类型</span>
+                            <select id="merchantDataType"></select>
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>店铺名称</span>
+                            <input type="text" id="merchantShopName" placeholder="例如：广州美弘办公用品有限公司企业店">
+                        </label>
+                        <label class="field">
+                            <span>店铺ID/备注</span>
+                            <input type="text" id="merchantShopId" placeholder="可填店铺ID、账号备注或负责人">
+                        </label>
+                    </div>
+                    <label class="field">
+                        <span>后台页面 URL</span>
+                        <input type="text" id="merchantUrl" placeholder="可粘贴登录后的商品/订单/数据页面 URL，留空则进平台首页">
+                    </label>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>等待秒数</span>
+                            <input type="number" id="merchantWaitSeconds" value="8" min="3" max="300">
+                        </label>
+                        <label class="field">
+                            <span>运行方式</span>
+                            <select id="merchantRunMode">
+                                <option value="session">使用已保存登录态</option>
+                                <option value="visible">可见浏览器手动登录</option>
+                            </select>
+                        </label>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn secondary" id="merchantLoginBtn"><i class="fa-solid fa-key"></i>保存登录态</button>
+                        <button class="btn secondary" id="merchantDiagnosticBtn"><i class="fa-solid fa-stethoscope"></i>运行前检查</button>
+                        <button class="btn primary" id="merchantRunBtn"><i class="fa-solid fa-play"></i>开始采集</button>
+                    </div>
+                    <div class="muted-note">提示：商家后台需要你自己的账号授权。第一版采集页面可见表格、卡片和指标文本。</div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <div>
+                            <h2>后台诊断</h2>
+                            <p id="merchantSummary">等待检查</p>
+                        </div>
+                    </div>
+                    <div class="check-list" id="merchantDiagnosticBox"></div>
+                </section>
+                <section class="panel span-2">
+                    <div class="panel-head">
+                        <div>
+                            <h2>采集结果</h2>
+                            <p id="merchantResultInfo">暂无结果</p>
+                        </div>
+                    </div>
+                    <div id="merchantResultTable" class="table-wrap empty">暂无数据</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-media">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>媒体采集</h2>
+                    </div>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>平台</span>
+                            <select id="mcPlatform"></select>
+                        </label>
+                        <label class="field">
+                            <span>类型</span>
+                            <select id="mcType">
+                                <option value="search">关键词搜索</option>
+                                <option value="detail">详情采集</option>
+                            </select>
+                        </label>
+                    </div>
+                    <label class="field">
+                        <span>关键词 / ID</span>
+                        <input type="text" id="mcKeyword" placeholder="输入关键词或内容 ID">
+                    </label>
+                    <div class="form-row">
+                        <label class="field">
+                            <span>登录方式</span>
+                            <select id="mcLoginType">
+                                <option value="qrcode">扫码登录</option>
+                                <option value="cookie">Cookie</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            <span>页数</span>
+                            <input type="number" id="mcPages" value="5" min="1" max="20">
+                        </label>
+                    </div>
+                    <div class="button-row">
+                        <button class="btn primary" id="mcStartBtn"><i class="fa-solid fa-play"></i>启动采集</button>
+                        <button class="btn danger hidden" id="mcStopBtn"><i class="fa-solid fa-stop"></i>停止</button>
+                    </div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>MediaCrawler 日志</h2>
+                        <button class="btn secondary" id="mcResultsBtn">查看结果</button>
+                    </div>
+                    <pre class="log-box" id="mcLog">等待操作...</pre>
+                    <div id="mcResultTable" class="table-wrap compact empty">暂无结果</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-results">
+            <div class="workspace results-grid">
+                <section class="panel span-2">
+                    <div class="panel-head">
+                        <h2>结果库</h2>
+                        <button class="btn secondary" id="refreshResultsBtn"><i class="fa-solid fa-rotate"></i>刷新</button>
+                    </div>
+                    <div class="result-tabs">
+                        <button class="selected" data-result-tab="tasks">任务中心</button>
+                        <button data-result-tab="crawler">商品结果</button>
+                        <button data-result-tab="media">媒体结果</button>
+                        <button data-result-tab="history">历史记录</button>
+                    </div>
+                    <div id="resultLibrary" class="table-wrap">加载中...</div>
+                </section>
+            </div>
+        </section>
+
+        <section class="view" id="view-settings">
+            <div class="workspace two-col">
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>运行环境</h2>
+                        <button class="btn secondary" id="settingsRefreshBtn">重新检测</button>
+                    </div>
+                    <div id="settingsHealth" class="health-grid single"></div>
+                </section>
+                <section class="panel">
+                    <div class="panel-head">
+                        <h2>会话与路径</h2>
+                    </div>
+                    <div class="settings-list" id="settingsPaths"></div>
+                    <div class="settings-list" id="sessionList"></div>
+                </section>
+            </div>
+        </section>
+    </main>
+</div>
+
+<nav class="mobile-nav" aria-label="移动导航">
+    <button class="active" data-view="overview"><i class="fa-solid fa-gauge"></i><span>总览</span></button>
+    <button data-view="crawler"><i class="fa-solid fa-mobile-screen"></i><span>商品</span></button>
+    <button data-view="competitor"><i class="fa-solid fa-binoculars"></i><span>竞品</span></button>
+    <button data-view="video"><i class="fa-solid fa-video"></i><span>视频</span></button>
+    <button data-view="merchant"><i class="fa-solid fa-store"></i><span>商家</span></button>
+    <button data-view="quick"><i class="fa-solid fa-bolt"></i><span>快抓</span></button>
+    <button data-view="results"><i class="fa-solid fa-table"></i><span>结果</span></button>
+</nav>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/static/workbench.js?v=20261004-unified"></script>
+</body>
+</html>

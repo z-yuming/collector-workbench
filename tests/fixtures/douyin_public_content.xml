@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hierarchy rotation="0">
+  <node index="0" text="" content-desc="" resource-id="" class="android.widget.FrameLayout" bounds="[0,0][1080,2400]">
+    <node index="1" text="@nike_store" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1300][500,1360]" />
+    <node index="2" text="Nike Air Zoom 公开测评，适合日常通勤和慢跑" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1370][900,1440]" />
+    <node index="3" text="" content-desc="点赞，按钮，1.2万" resource-id="" class="android.widget.Button" bounds="[960,820][1050,900]" />
+    <node index="4" text="" content-desc="评论，按钮，345" resource-id="" class="android.widget.Button" bounds="[960,930][1050,1010]" />
+    <node index="5" text="" content-desc="收藏，按钮，678" resource-id="" class="android.widget.Button" bounds="[960,1040][1050,1120]" />
+    <node index="6" text="" content-desc="分享，按钮，89" resource-id="" class="android.widget.Button" bounds="[960,1150][1050,1230]" />
+    <node index="7" text="播放 9.8万" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1250][300,1290]" />
+    <node index="8" text="Nike Air Zoom Pegasus 男款跑鞋" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1510][760,1565]" />
+    <node index="9" text="￥499" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1570][180,1630]" />
+    <node index="10" text="2.3万人付款" content-desc="" resource-id="" class="android.widget.TextView" bounds="[200,1575][430,1625]" />
+    <node index="11" text="全部评论 345" content-desc="" resource-id="" class="android.widget.TextView" bounds="[0,1680][1080,1740]" />
+    <node index="12" text="用户甲，2小时前，这双鞋脚感不错，15赞" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1760][980,1840]" />
+    <node index="13" text="用户乙，昨天，尺码偏正常，3赞" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1860][980,1940]" />
+  </node>
+</hierarchy>

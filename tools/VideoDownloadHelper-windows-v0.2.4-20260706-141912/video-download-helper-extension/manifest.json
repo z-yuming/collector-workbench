@@ -1,0 +1,43 @@
+{
+  "manifest_version": 3,
+  "name": "视频下载助手",
+  "version": "0.2.4",
+  "description": "下载页面中的视频资源，支持接口探测和完整 MP4 合成。",
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "视频下载助手"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "tabs",
+    "webRequest",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "page-hook.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

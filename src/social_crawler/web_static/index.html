@@ -1,0 +1,2190 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>采集工作台</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f6f8fb;
+        --surface: #ffffff;
+        --surface-soft: #f1f6f7;
+        --text: #121926;
+        --muted: #667085;
+        --border: #d9e2ea;
+        --line: #edf1f5;
+        --accent: #08756f;
+        --accent-dark: #065950;
+        --green: #16a34a;
+        --blue: #2563eb;
+        --orange: #f59e0b;
+        --purple: #7c3aed;
+        --danger: #b42318;
+        --shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+      }
+
+      .app {
+        display: grid;
+        grid-template-columns: 224px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        border-right: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.82);
+        padding: 26px 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-height: 44px;
+      }
+
+      .brand-mark {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: var(--accent);
+        display: grid;
+        place-items: center;
+        color: white;
+      }
+
+      .brand strong { display: block; font-size: 17px; }
+      .brand span { color: var(--muted); font-size: 12px; }
+
+      .nav {
+        display: grid;
+        gap: 8px;
+      }
+
+      .nav button,
+      .ghost {
+        border: 0;
+        background: transparent;
+        color: #344054;
+        min-height: 42px;
+        border-radius: 8px;
+        padding: 0 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+        text-align: left;
+      }
+
+      .nav button.active {
+        background: #e8f6f5;
+        color: var(--accent-dark);
+        font-weight: 700;
+      }
+
+      .service {
+        margin-top: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px;
+        background: var(--surface);
+        font-size: 13px;
+        color: var(--muted);
+      }
+
+      .service strong {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: var(--text);
+        margin-bottom: 8px;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--green);
+      }
+
+      main {
+        width: 100%;
+        max-width: 1640px;
+        padding: 22px 26px 24px;
+      }
+
+      .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 26px;
+        line-height: 1.2;
+        letter-spacing: 0;
+      }
+
+      .lead {
+        color: var(--muted);
+        margin-top: 8px;
+        font-size: 14px;
+        line-height: 1.5;
+        max-width: 760px;
+        word-break: break-word;
+      }
+
+      .top-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .outline-button {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: #344054;
+        min-height: 40px;
+        border-radius: 8px;
+        padding: 0 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+
+      .task-tabs {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .task-card {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: 8px;
+        min-height: 78px;
+        padding: 13px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        cursor: pointer;
+        text-align: left;
+        font: inherit;
+        box-shadow: none;
+        min-width: 0;
+      }
+
+      .task-card.active {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 145, 137, 0.12);
+      }
+
+      .task-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 8px;
+        color: white;
+        display: grid;
+        place-items: center;
+        flex: 0 0 auto;
+      }
+
+      .task-card strong {
+        display: block;
+        font-size: 15px;
+        margin-bottom: 4px;
+      }
+
+      .task-card span {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.35;
+      }
+
+      .task-card > span:last-child {
+        min-width: 0;
+      }
+
+      .task-card > span:last-child > span {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .workspace {
+        display: grid;
+        grid-template-columns: minmax(450px, 0.9fr) minmax(520px, 1.1fr);
+        gap: 16px;
+        align-items: start;
+        min-width: 0;
+      }
+
+      .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
+        min-width: 0;
+      }
+
+      .panel-head {
+        padding: 20px 22px 0;
+      }
+
+      .panel-head h2 {
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .panel-head p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      form {
+        padding: 20px 22px 22px;
+        min-width: 0;
+      }
+
+      .field {
+        margin-bottom: 18px;
+        min-width: 0;
+      }
+
+      label {
+        display: block;
+        font-size: 13px;
+        font-weight: 700;
+        color: #344054;
+        margin-bottom: 8px;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        min-height: 46px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        padding: 10px 12px;
+        color: var(--text);
+        font: inherit;
+        font-size: 14px;
+        outline: none;
+        resize: vertical;
+      }
+
+      input:focus,
+      select:focus,
+      textarea:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(15, 145, 137, 0.12);
+      }
+
+      .help-text {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 7px;
+      }
+
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .option-row {
+        border-top: 1px solid var(--line);
+        padding: 16px 0;
+        display: grid;
+        gap: 14px;
+      }
+
+      .advanced {
+        border-top: 1px solid var(--line);
+        padding-top: 14px;
+        margin-top: 2px;
+      }
+
+      .advanced summary {
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .advanced-body {
+        display: grid;
+        gap: 14px;
+        margin-top: 14px;
+      }
+
+      .switch-line {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+      }
+
+      .switch-line strong {
+        display: block;
+        font-size: 14px;
+      }
+
+      .switch-line span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .switch {
+        position: relative;
+        width: 52px;
+        height: 30px;
+        flex: 0 0 auto;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        inset: 0;
+        background: #cbd5e1;
+        border-radius: 999px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      .slider::after {
+        content: "";
+        position: absolute;
+        width: 24px;
+        height: 24px;
+        top: 3px;
+        left: 3px;
+        border-radius: 50%;
+        background: white;
+        box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+        transition: 0.2s;
+      }
+
+      .switch input:checked + .slider {
+        background: var(--accent);
+      }
+
+      .switch input:checked + .slider::after {
+        transform: translateX(22px);
+      }
+
+      .primary {
+        margin-top: 20px;
+        width: 100%;
+        min-height: 52px;
+        border: 0;
+        border-radius: 8px;
+        background: var(--accent);
+        color: white;
+        font: inherit;
+        font-size: 17px;
+        font-weight: 800;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .primary:hover { background: var(--accent-dark); }
+      .primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+      .notice {
+        margin-top: 16px;
+        border: 1px solid #bfdbfe;
+        background: #eff6ff;
+        color: #1d4ed8;
+        border-radius: 8px;
+        padding: 11px 12px;
+        font-size: 13px;
+      }
+
+      .phone-preview {
+        margin: 12px 22px 22px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 190px;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .phone-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+        grid-column: 1 / -1;
+      }
+
+      .phone-head h3 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .phone-actions {
+        display: flex;
+        gap: 8px;
+      }
+
+      .mini-button {
+        min-height: 32px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        color: #344054;
+        padding: 0 10px;
+        font: inherit;
+        font-size: 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .phone-frame {
+        width: min(190px, 100%);
+        aspect-ratio: 9 / 19.5;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        background: #0f172a;
+        overflow: hidden;
+        display: grid;
+        place-items: center;
+        cursor: crosshair;
+        justify-self: end;
+      }
+
+      .phone-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        background: #000;
+      }
+
+      .phone-empty {
+        color: #cbd5e1;
+        font-size: 13px;
+        padding: 20px;
+        text-align: center;
+      }
+
+      .phone-note {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 0;
+        line-height: 1.5;
+      }
+
+      .smart-tip {
+        display: none;
+        margin-top: 8px;
+        border: 1px solid #fde68a;
+        background: #fffbeb;
+        color: #92400e;
+        border-radius: 8px;
+        padding: 9px 10px;
+        font-size: 12px;
+      }
+
+      .smart-tip.show { display: block; }
+
+      .field-action {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 8px;
+      }
+
+      .status-card {
+        margin: 18px 18px 16px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: var(--surface-soft);
+        padding: 14px;
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .status-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: var(--accent);
+        background: white;
+        flex: 0 0 auto;
+      }
+
+      .status-card strong { display: block; font-size: 18px; }
+      .status-card span { color: var(--muted); font-size: 13px; }
+
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+        padding: 0 18px 16px;
+      }
+
+      .metric {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        padding: 13px 8px;
+        text-align: center;
+      }
+
+      .metric .small-icon {
+        margin: 0 auto 8px;
+      }
+
+      .metric span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .metric strong {
+        display: block;
+        font-size: 22px;
+        margin-top: 4px;
+      }
+
+      .downloads {
+        padding: 0 18px 18px;
+      }
+
+      .section-title {
+        margin: 0 0 12px;
+        font-size: 16px;
+      }
+
+      .preview {
+        padding: 0 18px 18px;
+      }
+
+      .preview-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .data-table-wrap {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        overflow: auto;
+        background: #fff;
+      }
+
+      .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 720px;
+        font-size: 13px;
+      }
+
+      .data-table th,
+      .data-table td {
+        border-bottom: 1px solid var(--line);
+        padding: 10px 11px;
+        text-align: left;
+        vertical-align: top;
+      }
+
+      .data-table th {
+        color: #344054;
+        background: #f8fafc;
+        font-weight: 800;
+        white-space: nowrap;
+      }
+
+      .data-table td {
+        color: #18202b;
+        line-height: 1.45;
+      }
+
+      .data-title {
+        max-width: 260px;
+        min-width: 180px;
+      }
+
+      .preview-item {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        background: #fff;
+      }
+
+      .preview-title {
+        font-weight: 800;
+        font-size: 14px;
+        line-height: 1.45;
+        margin-bottom: 8px;
+      }
+
+      .preview-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 12px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .download-list {
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        min-height: 96px;
+        padding: 14px;
+        display: grid;
+        gap: 10px;
+        align-content: center;
+      }
+
+      .history {
+        margin-top: 18px;
+        padding: 18px;
+      }
+
+      .history-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .history-list {
+        display: grid;
+        gap: 10px;
+        max-height: 280px;
+        overflow: auto;
+      }
+
+      .history-item {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        background: #fff;
+      }
+
+      .history-item strong {
+        display: block;
+        font-size: 13px;
+        line-height: 1.4;
+        margin-bottom: 6px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .history-item span {
+        display: block;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .history-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .device-detail {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+      }
+
+      .empty {
+        color: var(--muted);
+        text-align: center;
+        font-size: 13px;
+      }
+
+      .download-list a {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        min-height: 38px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 0 11px;
+        color: var(--accent-dark);
+        text-decoration: none;
+        font-size: 13px;
+        background: #fff;
+      }
+
+      .export-actions {
+        display: grid;
+        gap: 10px;
+      }
+
+      .secondary-wide {
+        width: 100%;
+        min-height: 40px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        color: #344054;
+        font: inherit;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .other-exports {
+        display: none;
+        gap: 10px;
+      }
+
+      .other-exports.show {
+        display: grid;
+      }
+
+      .video-helper {
+        padding: 0 18px 18px;
+      }
+
+      .section-title-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .section-title-row .section-title {
+        margin: 0;
+      }
+
+      .helper-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .helper-status {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        padding: 12px;
+        color: #344054;
+        font-size: 13px;
+        line-height: 1.5;
+        margin-bottom: 10px;
+      }
+
+      .helper-status strong {
+        color: #111827;
+      }
+
+      .helper-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .helper-item {
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        padding: 12px;
+        display: grid;
+        gap: 8px;
+      }
+
+      .helper-title {
+        font-size: 14px;
+        font-weight: 800;
+        color: #111827;
+        line-height: 1.45;
+        word-break: break-word;
+      }
+
+      .helper-meta {
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.5;
+        word-break: break-all;
+      }
+
+      .helper-item .mini-button {
+        justify-self: start;
+      }
+
+      .log-wrap {
+        padding: 0 18px 18px;
+      }
+
+      .log-wrap summary {
+        color: var(--muted);
+        cursor: pointer;
+        font-size: 13px;
+        margin-bottom: 8px;
+      }
+
+      .log {
+        max-height: 180px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 12px;
+        background: #fbfdff;
+        font: 12px Consolas, monospace;
+        white-space: pre-wrap;
+      }
+
+      .guide {
+        position: fixed;
+        inset: 0;
+        display: none;
+        place-items: center;
+        background: rgba(15, 23, 42, 0.36);
+        padding: 20px;
+      }
+
+      .guide.open { display: grid; }
+
+      .guide-box {
+        width: min(560px, 100%);
+        background: #fff;
+        border-radius: 8px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .guide-box h2 {
+        margin: 0 0 14px;
+        font-size: 20px;
+      }
+
+      .guide-box ol {
+        margin: 0;
+        padding-left: 22px;
+        color: #344054;
+        line-height: 1.8;
+      }
+
+      .guide-box button {
+        margin-top: 18px;
+        min-height: 40px;
+        border: 0;
+        border-radius: 8px;
+        padding: 0 14px;
+        background: var(--accent);
+        color: white;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .hidden { display: none; }
+
+      svg {
+        width: 21px;
+        height: 21px;
+        stroke: currentColor;
+        stroke-width: 2;
+        fill: none;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .small-icon {
+        width: 26px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+      }
+
+      @media (max-width: 1080px) {
+        .app { grid-template-columns: 1fr; }
+        .sidebar { display: none; }
+        main { padding: 18px; }
+        .workspace { grid-template-columns: 1fr; }
+        .task-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .phone-preview { grid-template-columns: minmax(0, 1fr) 180px; }
+      }
+
+      @media (max-width: 760px) {
+        main {
+          padding: 18px;
+          overflow-x: hidden;
+        }
+        .topbar { display: grid; min-width: 0; }
+        .top-actions { flex-wrap: wrap; }
+        .task-tabs { grid-template-columns: 1fr; }
+        .two-col { grid-template-columns: 1fr; }
+        .metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .phone-preview { grid-template-columns: 1fr; }
+        .phone-frame { justify-self: start; }
+      }
+    
+      .task-picker { display: grid; grid-template-columns: 180px minmax(0, 1fr); gap: 16px; margin-bottom: 18px; max-width: 660px; }
+      .task-picker .field { margin: 0; }
+      .module-toolbar { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; padding: 0 18px; }
+      .module-toolbar select { min-height: 38px; border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; font: inherit; background: #fff; }
+      .module-note { color: var(--muted); font-size: 13px; line-height: 1.7; padding: 0 18px; }
+      .module-frame { width: 100%; min-height: 780px; border: 0; }
+      #videoForm { padding: 0 18px 24px; }
+      #videoForm .module-toolbar, #videoForm .module-note { padding: 0; }
+      #videoForm .primary { width: auto; margin: 0; min-height: 40px; padding: 0 18px; font-size: 14px; font-weight: 600; }
+      .video-metadata { white-space: pre-wrap; line-height: 1.8; font-size: 14px; }
+      .helper-details { margin-top: 18px; }
+      .helper-details > summary { padding: 18px; cursor: pointer; font-weight: 600; }
+      .history { margin-top: 0; min-width: 0; }
+      .history .module-toolbar { padding-top: 18px; }
+      .mobile-nav { display: none; }
+      .mobile-nav button { background: #fff; color: var(--muted); border: 1px solid var(--border); border-radius: 8px; min-height: 40px; font: inherit; cursor: pointer; }
+      .mobile-nav button.active { color: var(--accent); border-color: var(--accent); }
+      @media (max-width: 1080px) { .mobile-nav { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-bottom: 18px; } }
+      @media (max-width: 760px) { .task-picker { grid-template-columns: 1fr; } .mobile-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } .module-frame { min-height: 900px; } }
+
+      button:focus-visible, summary:focus-visible { outline: 2px solid var(--accent-dark); outline-offset: 3px; }
+      .switch { height: 44px; width: 58px; }
+      .switch input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; z-index: 1; cursor: pointer; }
+      .switch .slider { top: 9px; bottom: 9px; }
+      .switch:focus-within { outline: 2px solid var(--accent-dark); outline-offset: 3px; border-radius: 8px; }
+      input::placeholder, textarea::placeholder { color: var(--muted); opacity: 1; }
+      .mini-button, .outline-button, #videoForm .primary, .mobile-nav button { min-height: 44px; }
+      .task-strip { margin-bottom: 22px; padding: 16px 18px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+      .task-strip-head { display: flex; gap: 16px; flex-wrap: wrap; align-items: baseline; margin-bottom: 8px; }
+      .task-strip h2 { margin: 0; font-size: 16px; }
+      #taskConnection { color: var(--muted); font-size: 13px; }
+      .active-task-row { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+      .active-task-row .task-description { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+      .active-task-row strong { display: block; font-size: 14px; }
+      .active-task-row span { color: var(--muted); font-size: 13px; }
+      .preflight { margin: 16px 0; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface-soft); }
+      .preflight p { margin: 5px 0; font-size: 13px; overflow-wrap: anywhere; }
+      .preflight strong { color: var(--text); }
+      .preflight .blocked { color: #b42318; }
+      .preflight .warning { color: #854d0e; }
+      #checkCollect { width: 100%; margin-top: 12px; justify-content: center; }
+      .history-filters { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; padding: 16px 18px 0; }
+      .history-filters .field { margin: 0; }
+      .filter-actions { display: flex; gap: 8px; grid-column: 1 / -1; }
+      .history-list { max-height: none; overflow: visible; }
+      .metrics { grid-template-columns: repeat(auto-fit,minmax(90px,1fr)); }
+      #resultPanel .data-table-wrap { max-height: 360px; overflow: auto; }
+      @media (min-width: 1081px) { #resultPanel { position: sticky; top: 18px; } }
+      .history-item { cursor: default; }
+      .history-item.selected { border-color: var(--accent); background: var(--surface-soft); }
+      .history-item strong { white-space: normal; overflow-wrap: anywhere; }
+      .detail-actions { display: flex; gap: 8px; flex-wrap: wrap; padding: 0 18px 12px; }
+      .detail-progress { margin: 0 18px 18px; color: var(--muted); font-size: 13px; }
+      .detail-progress progress { display: block; width: 100%; height: 10px; margin: 8px 0; accent-color: var(--accent); }
+      #resultPanel { align-self: start; }
+      .guide { border: 0; width: min(600px,calc(100% - 32px)); height: fit-content; padding: 0; background: var(--surface); color: var(--text); }
+      .guide[open] { display: block; }
+      .guide::backdrop { background: rgba(15,23,42,.36); }
+      .guide-box { width: 100%; box-shadow: none; }
+      .data-table td { overflow-wrap: anywhere; }
+      @media (max-width: 760px) {
+        input, select, textarea { font-size: 16px; }
+        .history-filters { grid-template-columns: 1fr; }
+        .active-task-row { align-items: flex-start; flex-wrap: wrap; }
+        .active-task-row .task-description { flex-basis: 100%; }
+        .module-frame { min-height: 620px; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">
+            <svg viewBox="0 0 24 24"><path d="M12 3v10" /><path d="m8 9 4 4 4-4" /><path d="M5 17h14" /><path d="M7 21h10" /></svg>
+          </div>
+          <div>
+            <strong>采集工作台</strong>
+            <span>本地采集与下载</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="工作台导航">
+          <button class="active" type="button" data-workbench-view="collect">数据采集</button>
+          <button type="button" data-workbench-view="video">视频下载</button>
+          <button type="button" data-workbench-view="legacy">店铺与竞品</button>
+          <button type="button" data-workbench-view="history">任务记录</button>
+        </nav>
+
+        <div class="service">
+          <strong><span class="dot"></span><span id="health">正在检查服务</span></strong>
+          <div id="localAddress">本地地址：127.0.0.1:8765</div>
+        </div>
+      </aside>
+
+      <main>
+        <header class="topbar">
+          <div>
+            <h1 id="workbenchTitle">数据采集</h1>
+            <div class="lead" id="workbenchLead">选择平台与任务，在同一张表单中采集和导出。</div>
+          </div>
+          <div class="top-actions">
+            <button class="outline-button" id="guideBtn" type="button"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 1 1 5.2 2c-.9.8-1.3 1.2-1.3 2" /><path d="M12 17h.01" /></svg>使用指南</button>
+            <button class="outline-button" id="refreshDevice" type="button"><svg viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" /></svg><span id="deviceText">正在检测设备</span></button>
+          </div>
+        </header>
+
+        <nav class="mobile-nav" aria-label="工作台导航">
+          <button type="button" data-workbench-view="collect">数据采集</button><button type="button" data-workbench-view="video">视频下载</button>
+          <button type="button" data-workbench-view="legacy">店铺与竞品</button><button type="button" data-workbench-view="history">任务记录</button>
+        </nav>
+        <section id="activeTasks" class="task-strip hidden" aria-labelledby="activeTasksTitle"><div class="task-strip-head"><h2 id="activeTasksTitle">进行中的任务</h2><span id="taskConnection" role="status"></span></div><div id="activeTaskList"></div></section>
+        <section id="collectView" class="workbench-view">
+        <div class="task-picker">
+          <div class="field"><label for="taskCategory">采集类别</label><select id="taskCategory"><option value="products">商品数据</option><option value="content">内容与互动</option></select></div>
+          <div class="field"><label for="taskChoice">平台与任务</label><select id="taskChoice"></select></div>
+        </div>
+        <div class="workspace" id="collectWorkspace">
+          <section class="panel">
+            <div class="panel-head">
+              <h2 id="formTitle">单个视频链接采集</h2>
+              <p id="formDesc">适合你已经有一个抖音视频链接，只想提取这一条视频的数据。</p>
+            </div>
+
+            <form id="taskForm">
+              <input type="hidden" name="platform" value="douyin" />
+              <input type="hidden" name="mode" value="ui" />
+              <input type="hidden" name="taskType" value="content" />
+
+              <div class="field hidden" id="collectionModeField">
+                <label for="collectionMode">采集方式</label>
+                <select id="collectionMode" name="collectionMode"></select>
+              </div>
+
+              <div class="field">
+                <label id="queryLabel" for="queryInput">抖音视频链接</label>
+                <textarea id="queryInput" aria-describedby="queryHelp" name="query" rows="2" placeholder="粘贴抖音视频链接，例如 https://v.douyin.com/xxxxxx/" required></textarea>
+                <div class="help-text" id="queryHelp">请使用你在手机或浏览器里能正常打开的公开视频链接。</div>
+                <div class="smart-tip" id="smartTip"></div>
+                <div class="field-action">
+                  <button class="mini-button" id="openUrlOnDevice" type="button">先打开到手机确认</button>
+                </div>
+              </div>
+
+              <div class="field two-col" id="keywordFields">
+                <div>
+                  <label id="limitLabel" for="limitCount">最多采集视频数</label>
+                  <input id="limitCount" name="limit" type="number" min="1" value="1" />
+                </div>
+                <div>
+                  <label for="maxPagesInput">最多翻页数</label>
+                  <input id="maxPagesInput" name="maxPages" type="number" min="1" value="1" />
+                </div>
+              </div>
+
+              <div class="option-row" id="commentOptions">
+                <div class="switch-line">
+                  <div>
+                    <strong>采集公开评论</strong>
+                    <span>只采集当前页面正常可见的公开评论。</span>
+                  </div>
+                  <label class="switch">
+                    <input aria-label="采集公开评论" name="comments" type="checkbox" checked />
+                    <span class="slider"></span>
+                  </label>
+                </div>
+                <div class="two-col">
+                  <div>
+                    <label for="maxCommentsInput">最多评论数</label>
+                    <input id="maxCommentsInput" name="maxComments" type="number" min="0" value="5" />
+                  </div>
+                  <div></div>
+                </div>
+              </div>
+
+              <details class="advanced">
+                <summary>高级设置</summary>
+                <div class="advanced-body">
+                  <div>
+                    <label for="serialInput">设备序列号</label>
+                    <input id="serialInput" name="serial" placeholder="可不填；多台设备时再填写" />
+                    <div class="help-text">只连接一台设备时不用填。多台设备时填写指定设备序列号。</div>
+                  </div>
+                  <div>
+                    <label for="qualityInput">校验要求</label>
+                    <select id="qualityInput" name="quality">
+                      <option value="normal">采到内容或商品数据即可</option>
+                      <option value="comments">必须采到评论</option>
+                    </select>
+                  </div>
+                </div>
+              </details>
+
+              <div id="collectPreflight" class="preflight hidden" aria-live="polite"></div><button class="outline-button" id="checkCollect" type="button">检查采集条件</button>
+              <button class="primary" id="runBtn" type="submit">
+                <svg viewBox="0 0 24 24"><path d="m8 5 10 7-10 7V5Z" /></svg>
+                开始采集
+              </button>
+
+              <div class="notice">只采集你正常使用 APP 时能看到的公开数据，不处理登录绕过、验证码绕过或私密内容。</div>
+            </form>
+
+            <div class="phone-preview" id="phonePreview">
+              <div class="phone-head">
+                <h3>手机画面</h3>
+                <div class="phone-actions">
+                  <button class="mini-button" id="refreshScreen" type="button">刷新</button>
+                  <button class="mini-button" id="toggleLive" type="button">开始实时</button>
+                  <button class="mini-button" id="openMirror" type="button">原生投屏</button>
+                </div>
+              </div>
+              <div class="phone-frame">
+                <div class="phone-empty" id="phoneEmpty">点击“刷新”查看当前手机画面。</div>
+                <img id="phoneScreen" class="hidden" alt="手机实时画面" />
+              </div>
+              <div class="phone-note" id="phoneNote">准实时预览约每秒刷新一次，用于确认页面状态。</div>
+            </div>
+          </section>
+
+          <section class="panel" id="resultPanel" aria-labelledby="detailHeading">
+            <div class="panel-head">
+              <h2 id="detailHeading">采集状态</h2><p class="preview-meta" id="detailContext"></p>
+            </div>
+            <div class="status-card">
+              <div class="status-icon" id="statusIcon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg></div>
+              <div>
+                <strong id="statusTitle">等待开始</strong>
+                <span id="statusText">填写左侧信息后点击“开始采集”。</span>
+              </div>
+            </div>
+
+            <div id="detailActions" class="detail-actions"></div><div id="detailProgress" class="detail-progress hidden" aria-live="polite"></div>
+            <div class="metrics">
+              <div class="metric"><div class="small-icon" style="color: var(--accent)"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="12" height="12" rx="2" /><path d="m15 10 5-3v10l-5-3" /></svg></div><span id="mContentsLabel">内容</span><strong id="mContents">0</strong></div>
+              <div class="metric"><div class="small-icon" style="color: var(--green)"><svg viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" /></svg></div><span>评论</span><strong id="mComments">0</strong></div>
+              <div class="metric"><div class="small-icon" style="color: var(--orange)"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z" /><path d="m9 12 2 2 4-4" /></svg></div><span>状态</span><strong id="mOk">--</strong></div>
+              <div class="metric"><div class="small-icon" style="color: var(--purple)"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z" /><path d="M14 2v6h6" /></svg></div><span>文件</span><strong id="mFiles">0</strong></div>
+            </div>
+
+            <div class="downloads">
+              <h3 class="section-title">采集到的数据</h3>
+              <div class="preview-list" id="previewList">
+                <div class="empty">采集完成后，会在这里显示数据表。</div>
+              </div>
+            </div>
+
+            <div class="downloads">
+              <h3 class="section-title">下载文件</h3>
+              <div class="download-list" id="links">
+                <div class="empty">采集完成后，先显示 Excel；其他格式由你决定是否下载。</div>
+              </div>
+            </div>
+            <div class="log-wrap">
+              <details>
+                <summary>查看详细日志</summary>
+                <div class="log" id="log">暂无日志。</div>
+              </details>
+            </div>
+          </section>
+        </div>
+
+        </section>
+        <section id="historyView" class="workbench-view hidden"><div class="workspace" id="historyWorkspace">
+        <section class="panel history">
+          <div class="module-toolbar"><label for="historySource">记录来源</label><select id="historySource"><option value="all">全部模块</option><option value="collect">数据采集</option><option value="scraper">店铺与竞品</option><option value="video">视频下载</option></select></div>
+          <form id="historyFilters" class="history-filters">
+            <div class="field"><label for="historySearch">关键词或平台</label><input id="historySearch" type="search" placeholder="搜索任务记录" maxlength="100" /></div>
+            <div class="field"><label for="historyStatus">状态</label><select id="historyStatus"><option value="all">全部状态</option><option value="queued">排队中</option><option value="running">处理中</option><option value="success">完成</option><option value="partial">需确认</option><option value="failed">失败</option><option value="cancelled">已取消</option><option value="interrupted">运行中断</option></select></div>
+            <div class="field"><label for="historyStart">开始日期</label><input id="historyStart" type="date" /></div><div class="field"><label for="historyEnd">结束日期</label><input id="historyEnd" type="date" /></div>
+            <div class="filter-actions"><button class="outline-button" type="submit">筛选记录</button><button class="mini-button" id="clearHistoryFilters" type="button">清除筛选</button></div>
+          </form><p class="module-note" id="historySources"></p><p class="module-note" id="historyWarnings" role="status"></p>
+          <h2 class="section-title">任务记录</h2>
+          <div class="history-list" id="historyList">
+            <div class="empty">还没有采集记录。</div>
+          </div>
+          <div class="history-pagination">
+            <button class="mini-button" id="historyPrev" type="button" disabled>上一页</button>
+            <span id="historyPageInfo" aria-live="polite">正在读取任务记录</span>
+            <button class="mini-button" id="historyNext" type="button" disabled>下一页</button>
+          </div>
+        </section>
+      </div></section>
+        <section id="videoView" class="workbench-view hidden">
+          <section class="panel">
+            <div class="panel-head"><h2>视频与图集</h2><p>粘贴抖音分享链接，解析信息或保存文件。</p></div>
+            <form id="videoForm">
+              <div class="field"><label for="videoUrl">分享链接</label><textarea id="videoUrl" name="url" rows="3" placeholder="粘贴抖音视频或图集分享链接" required></textarea></div>
+              <div id="videoPreflight" class="preflight hidden" aria-live="polite"></div><div class="module-toolbar"><button class="outline-button" id="checkVideo" type="button">检查下载条件</button><button class="outline-button" type="submit" value="parse">解析信息</button><button class="primary" type="submit" value="download">下载视频 / 图集</button></div>
+              <p class="module-note" id="videoTaskStatus" role="status" aria-live="polite">等待输入链接。</p>
+              <div class="video-metadata" id="videoMetadata"></div><div class="download-list" id="videoDownloads"></div>
+            </form>
+          </section>
+          <details class="panel helper-details"><summary>浏览器播放捕获</summary><div class="video-helper">
+              <div class="section-title-row">
+                <h3 class="section-title">视频下载助手</h3>
+                <div class="helper-actions">
+                  <button class="mini-button" id="refreshVideoHelper" type="button">刷新</button>
+                  <button class="mini-button" id="startVideoHelper" type="button">启动</button>
+                  <button class="mini-button" id="openVideoFolder" type="button">打开目录</button>
+                </div>
+              </div>
+              <div class="helper-status" id="videoHelperStatus">正在读取插件状态...</div>
+              <div class="helper-list" id="videoHelperItems">
+                <div class="empty">打开抖音网页版并播放视频后，点击刷新查看插件捕获到的视频。</div>
+              </div>
+            </div>
+
+            </details>
+        </section>
+        <section id="legacyView" class="workbench-view hidden">
+          <section class="panel">
+            <div class="panel-head"><h2>店铺与竞品</h2><p>店铺、竞品和媒体采集模块已内置，在这里直接使用。</p></div>
+            <div class="module-toolbar"><label for="legacyTask">功能</label><select id="legacyTask"><option value="competitor">竞品采集</option><option value="merchant">商家后台</option><option value="media">媒体采集</option><option value="results">结果库</option><option value="settings">登录与设置</option></select><button class="outline-button" id="startScraper" type="button">启动模块</button><button class="mini-button" id="refreshModules" type="button">刷新状态</button></div>
+            <p class="module-note" id="moduleStatus" role="status" aria-live="polite">正在检查模块状态。</p>
+            <iframe class="module-frame hidden" id="scraperFrame" title="店铺与竞品功能"></iframe>
+          </section>
+        </section>
+        </main>
+    </div>
+
+    <dialog class="guide" id="guide" aria-labelledby="guideTitle">
+      <div class="guide-box">
+        <h2 id="guideTitle">怎么用</h2>
+        <ol>
+          <li>数据采集：选择类别、平台和采集方式，填写关键词、链接或已保存网页路径。</li>
+          <li>视频下载：粘贴分享链接，解析信息或下载视频、图集。</li>
+          <li>店铺与竞品：启动模块后，在同一个工作台使用原有功能。</li>
+          <li>任务记录：按来源、日期和状态筛选记录，查看结果并下载文件，也可恢复参数或重试。</li>
+          <li>手机采集需要连接设备；采集过程中保持当前 APP 页面。</li><li>进行中的任务会保存状态；可以取消，也可以刷新页面后继续查看。</li>
+        </ol>
+        <button type="button" id="closeGuide">知道了</button>
+      </div>
+    </dialog>
+
+    <script>
+      const taskCards = document.querySelectorAll(".task-card");
+      const form = document.getElementById("taskForm");
+      const runBtn = document.getElementById("runBtn");
+      const links = document.getElementById("links");
+      const log = document.getElementById("log");
+      const deviceText = document.getElementById("deviceText");
+      const previewList = document.getElementById("previewList");
+      const historyList = document.getElementById("historyList");
+      const smartTip = document.getElementById("smartTip");
+      const phoneScreen = document.getElementById("phoneScreen");
+      const phoneEmpty = document.getElementById("phoneEmpty");
+      const phoneNote = document.getElementById("phoneNote");
+      const toggleLive = document.getElementById("toggleLive");
+      const videoHelperStatus = document.getElementById("videoHelperStatus");
+      const videoHelperItems = document.getElementById("videoHelperItems");
+      const collectionMode = document.getElementById("collectionMode");
+      const historyPrev = document.getElementById("historyPrev");
+      const historyNext = document.getElementById("historyNext");
+      const historyPageInfo = document.getElementById("historyPageInfo");
+      const historyPageSize = 8;
+      let historyPage = 0;
+      let historyLoading = false;
+      let restoredPayload = null;
+      let liveTimer = null;
+      const presets = {
+        video: {
+          title: "单个视频链接采集",
+          desc: "适合你已经有一个抖音视频链接，只想提取这一条视频的数据。",
+          platform: "douyin",
+          mode: "ui",
+          taskType: "content",
+          label: "抖音视频链接",
+          placeholder: "粘贴抖音视频链接，例如 https://v.douyin.com/xxxxxx/",
+          help: "请使用你在手机或浏览器里能正常打开的公开视频链接。",
+          limit: 1,
+          maxPages: 1,
+          maxComments: 5,
+          comments: true,
+          showKeywordFields: false
+        },
+        keyword: {
+          title: "关键词批量采集",
+          desc: "适合按关键词搜索公开视频，并批量提取互动数据。",
+          platform: "douyin",
+          mode: "ui",
+          taskType: "keyword",
+          label: "搜索关键词",
+          placeholder: "例如 nike、穿搭、露营装备",
+          help: "建议先小批量测试，比如 3 个视频、1 页。",
+          limit: 3,
+          maxPages: 1,
+          maxComments: 3,
+          comments: true,
+          showKeywordFields: true
+        },
+        batch: {
+          title: "批量视频链接采集",
+          desc: "适合你已经整理好多个抖音视频链接，希望一次性采集并合并导出。",
+          platform: "douyin",
+          mode: "ui",
+          taskType: "content",
+          label: "抖音视频链接",
+          placeholder: "一行一个链接，也可以粘贴抖音分享文案\nhttps://v.douyin.com/xxxxxx/\nhttps://v.douyin.com/yyyyyy/",
+          help: "软件会自动去重，并逐条打开采集。建议先用 3 到 5 条测试。",
+          limit: 1,
+          maxPages: 1,
+          maxComments: 3,
+          comments: true,
+          showKeywordFields: false
+        },
+        shop: {
+          title: "商城商品采集",
+          desc: "适合按商品关键词采集抖音商城/商品结果里的公开商品信息。",
+          platform: "douyin",
+          mode: "ui",
+          taskType: "products",
+          label: "商品关键词",
+          placeholder: "例如 nike、眼霜、运动鞋",
+          help: "会自动搜索并切到商品页。当前优先采集可见商品名、价格、销量/付款、店铺和截图证据。",
+          limit: 5,
+          maxPages: 2,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        },
+        web: {
+          title: "公开网页采集",
+          desc: "适合采集一个公开网页里的标题、描述和页面上能读取到的互动数据。",
+          platform: "generic_web",
+          mode: "web",
+          taskType: "content",
+          label: "公开网页链接或本地 HTML 文件",
+          placeholder: "https://example.com/page 或 tests\\\\fixtures\\\\generic_social_public.html",
+          help: "只读取公开网页内容，不登录、不破解、不绕过限制。",
+          limit: 1,
+          maxPages: 1,
+          maxComments: 2,
+          comments: true,
+          showKeywordFields: false
+        },
+        taobao: {
+          title: "淘宝/天猫商品搜索（ADB）",
+          desc: "ADB模拟器模式：输入关键词，自动操作淘宝APP搜索并提取商品名、价格、销量和店铺。",
+          platform: "taobao",
+          mode: "adb",
+          taskType: "products",
+          label: "淘宝/天猫搜索关键词 或 已保存的 .html 文件路径",
+          placeholder: "D:\\saved_pages\\taobao_search.html 或 眼油",
+          help: "1) Chrome打开搜索结果页 2) Ctrl+S保存为网页 3) 粘贴文件路径。也可输入关键词尝试。",
+          limit: 10,
+          maxPages: 1,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        },
+        jd: {
+          title: "京东商品搜索（ADB）",
+          desc: "ADB模拟器模式：输入关键词，自动操作京东APP搜索并提取商品名、价格。",
+          platform: "jd",
+          mode: "adb",
+          taskType: "products",
+          label: "京东搜索关键词 或 已保存的 .html 文件路径",
+          placeholder: "D:\\saved_pages\\jd_search.html 或 眼部精华",
+          help: "1) Chrome打开搜索结果页 2) Ctrl+S保存为网页 3) 粘贴文件路径。也可输入关键词尝试。",
+          limit: 10,
+          maxPages: 1,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        },
+        xhs: {
+          title: "小红书搜索",
+          desc: "自动浏览器模式：输入关键词，Chrome 自动打开小红书搜索并提取笔记标题和互动数据。",
+          platform: "xiaohongshu",
+          mode: "browser",
+          taskType: "content",
+          label: "小红书搜索关键词 或 已保存的 .html 文件路径",
+          placeholder: "D:\\saved_pages\\xhs_search.html 或 眼油测评",
+          help: "1) Chrome打开搜索结果页 2) 等完全加载 3) Ctrl+S保存为网页 4) 粘贴文件路径。也可输入关键词尝试。",
+          limit: 10,
+          maxPages: 1,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        },
+        pdd: {
+          title: '拼多多商品搜索',
+          desc: '从拼多多搜索结果页保存的 HTML 文件，提取商品名、拼团价、已拼件数和店铺。',
+          platform: 'pinduoduo',
+          mode: 'search',
+          taskType: 'products',
+          label: '拼多多搜索关键词 或 已保存的 .html 文件路径',
+          placeholder: 'D:\\saved_pages\\pdd_search.html 或 眼油',
+          help: '1) Chrome 打开搜索结果页 2) Ctrl+S 保存为网页 3) 粘贴文件路径。也可输入关键词尝试。',
+          limit: 10,
+          maxPages: 1,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        },
+        ali1688: {
+          title: '1688 商品搜索',
+          desc: '从 1688 搜索结果页保存的 HTML 文件，提取商品名、批发价、起批量和供应商。',
+          platform: '1688',
+          mode: 'search',
+          taskType: 'products',
+          label: '1688 搜索关键词 或 已保存的 .html 文件路径',
+          placeholder: 'D:\\saved_pages\\1688_search.html 或 眼部精华油',
+          help: '1) Chrome 打开搜索结果页 2) Ctrl+S 保存为网页 3) 粘贴文件路径。也可输入关键词尝试。',
+          limit: 10,
+          maxPages: 1,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        },
+        dewu: {
+          title: '得物商品搜索',
+          desc: '从得物搜索结果页保存的 HTML 文件，提取商品名、价格、销量。',
+          platform: 'dewu',
+          mode: 'search',
+          taskType: 'products',
+          label: '得物搜索关键词 或 已保存的 .html 文件路径',
+          placeholder: 'D:\\saved_pages\\dewu_search.html 或 nike',
+          help: '1) Chrome 打开搜索结果页 2) Ctrl+S 保存为网页 3) 粘贴文件路径。也可输入关键词尝试。',
+          limit: 10,
+          maxPages: 1,
+          maxComments: 0,
+          comments: false,
+          showKeywordFields: true
+        }
+
+
+      };
+
+      const taskGroups = { products: ["taobao", "jd", "pdd", "ali1688", "dewu", "shop"], content: ["video", "keyword", "batch", "xhs", "web"] };
+      const taskLabels = { taobao: "淘宝 / 天猫商品", jd: "京东商品", pdd: "拼多多商品", ali1688: "1688 商品", dewu: "得物商品", shop: "抖音商城商品", video: "抖音单个视频", keyword: "抖音关键词", batch: "抖音批量链接", xhs: "小红书笔记", web: "公开网页" };
+      const taskCategory = document.getElementById("taskCategory");
+      const taskChoice = document.getElementById("taskChoice");
+      let moduleState = null;
+      let activeWorkbenchView = "collect";
+
+      function syncTaskPicker(name) {
+        const group = taskGroups.products.includes(name) ? "products" : "content";
+        taskCategory.value = group;
+        taskChoice.replaceChildren(...taskGroups[group].map(task => {
+          const option = document.createElement("option"); option.value = task; option.textContent = taskLabels[task]; return option;
+        }));
+        taskChoice.value = name;
+      }
+      taskCategory.addEventListener("change", () => setTask(taskGroups[taskCategory.value][0]));
+      taskChoice.addEventListener("change", () => setTask(taskChoice.value));
+
+      function showWorkbenchView(name) {
+        activeWorkbenchView = name;
+        ["collect", "video", "legacy", "history"].forEach(view => document.getElementById(`${view}View`).classList.toggle("hidden", view !== name));
+        document.querySelectorAll("[data-workbench-view]").forEach(button => {
+          const selected = button.dataset.workbenchView === name; button.classList.toggle("active", selected);
+          if (selected) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
+        });
+        const descriptions = { collect: "选择平台与任务，在同一张表单中采集和导出。", video: "分享链接解析、视频图集下载和浏览器播放捕获。", legacy: "店铺、竞品和媒体功能统一从这里进入。", history: "各模块的记录集中查看，数据统一保存在项目目录。" };
+        const names = { collect: "数据采集", video: "视频下载", legacy: "店铺与竞品", history: "任务记录" };
+        document.getElementById("workbenchTitle").textContent = names[name];
+        document.getElementById("workbenchLead").textContent = descriptions[name];
+        if (["collect", "history"].includes(name)) document.getElementById(`${name}Workspace`).appendChild(document.getElementById("resultPanel"));
+        syncDeviceContext();
+        if (name === "history") { resetDetail(); loadHistory(); }
+        if (name === "legacy") updateScraperFrame();
+        history.replaceState(null, "", `#${name}`);
+      }
+      document.querySelectorAll("[data-workbench-view]").forEach(button => button.addEventListener("click", () => showWorkbenchView(button.dataset.workbenchView)));
+      document.getElementById("historySource").addEventListener("change", () => { resetDetail(); loadHistory(0); });
+      function sourceLabel(source) { return { collect: "数据采集", scraper: "店铺与竞品", video: "视频下载" }[source] || "数据采集"; }
+
+      function updateScraperFrame() {
+        const frame = document.getElementById("scraperFrame");
+        const ready = Boolean(moduleState?.scraper?.running);
+        frame.classList.toggle("hidden", !ready);
+        if (!ready || activeWorkbenchView !== "legacy") return;
+        const url = `${moduleState.scraper.url}?embedded=1&view=${document.getElementById("legacyTask").value}`;
+        if (frame.getAttribute("src") !== url) frame.src = url;
+      }
+      async function loadModules() {
+        const status = document.getElementById("moduleStatus");
+        try {
+          const response = await fetch("/api/workbench/status");
+          if (!response.ok) throw new Error("状态读取失败");
+          moduleState = await response.json();
+          status.textContent = moduleState.scraper.running ? "模块已连接，可以直接使用下方功能。" : moduleState.scraper.available ? "模块尚未启动，点击启动后可在这里使用。" : "模块运行环境不完整，请检查工作台模块目录。";
+          document.getElementById("startScraper").disabled = moduleState.scraper.running || !moduleState.scraper.available;
+          updateScraperFrame();
+        } catch { status.textContent = "模块状态暂不可用，请刷新重试。"; }
+      }
+      document.getElementById("legacyTask").addEventListener("change", updateScraperFrame);
+      document.getElementById("refreshModules").addEventListener("click", loadModules);
+      document.getElementById("startScraper").addEventListener("click", async () => {
+        const button = document.getElementById("startScraper"); button.disabled = true;
+        document.getElementById("moduleStatus").textContent = "正在启动模块，请等待。";
+        try {
+          const response = await fetch("/api/workbench/scraper/start", { method: "POST" });
+          const result = await response.json(); if (!result.ok) throw new Error(result.message);
+          await loadModules();
+        } catch (error) { document.getElementById("moduleStatus").textContent = error.message || "模块启动失败。"; button.disabled = false; }
+      });
+
+      function formatVideoMetadata(metadata) {
+        const labels = { desc: "文案", title: "标题", author: "作者", author_name: "作者", author_nickname: "作者", nickname: "作者", aweme_id: "作品编号", duration: "时长", content_type: "类型", image_count: "图片数量", create_time: "发布时间", digg_count: "点赞", comment_count: "评论", share_count: "分享", collect_count: "收藏" };
+        return Object.entries(metadata || {}).map(([key, value]) => {
+          if (key === "create_time" && Number(value) > 0) value = new Date(Number(value) * 1000).toLocaleString("zh-CN");
+          if (key === "content_type") value = { video: "视频", image: "图集" }[value] || value;
+          return `${labels[key] || key}：${value}`;
+        }).join("\n");
+      }
+      document.getElementById("videoForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        await submitTask("video", {action: event.submitter?.value || "parse", url: event.currentTarget.url.value});
+      });
+
+      let currentTask = "video";
+
+      function setTask(name) {
+        restoredPayload = null;
+        currentTask = name;
+        syncTaskPicker(name);
+        const preset = presets[name];
+        taskCards.forEach((card) => card.classList.toggle("active", card.dataset.task === name));
+        form.platform.value = preset.platform;
+        form.mode.value = preset.mode;
+        form.taskType.value = preset.taskType;
+        form.query.value = "";
+        form.query.placeholder = preset.placeholder;
+        form.query.rows = name === "batch" ? 6 : 2;
+        form.limit.value = preset.limit;
+        form.maxPages.value = preset.maxPages;
+        form.maxComments.value = preset.maxComments;
+        form.comments.checked = preset.comments;
+        document.getElementById("formTitle").textContent = preset.title;
+        document.getElementById("formDesc").textContent = preset.desc;
+        document.getElementById("queryLabel").textContent = preset.label;
+        document.getElementById("queryHelp").textContent = preset.help;
+        document.getElementById("keywordFields").classList.toggle("hidden", !preset.showKeywordFields);
+        document.getElementById("limitLabel").textContent = preset.taskType === "products"
+          ? "最多采集商品数" : name === "xhs" ? "最多采集笔记数" : "最多采集视频数";
+        if (name === "web") {
+          form.serial.parentElement.classList.add("hidden");
+          form.query.value = "tests\\\\fixtures\\\\generic_social_public.html";
+        } else {
+          form.serial.parentElement.classList.remove("hidden");
+        }
+        const modes = ["taobao", "jd", "pdd"].includes(name)
+          ? ["adb", "browser", "search"]
+          : ["xhs", "ali1688", "dewu"].includes(name) ? ["browser", "search"] : [];
+        collectionMode.replaceChildren(...modes.map((mode) => {
+          const option = document.createElement("option");
+          option.value = mode;
+          option.textContent = mode === "adb" ? "手机 APP" : mode === "browser" ? "浏览器搜索" : "已保存网页";
+          return option;
+        }));
+        document.getElementById("collectionModeField").classList.toggle("hidden", !modes.length);
+        if (modes.length) {
+          collectionMode.value = preset.mode;
+          updateCollectionMode();
+        }
+        document.getElementById("commentOptions").classList.toggle("hidden", preset.taskType === "products");
+        document.getElementById("phonePreview").classList.toggle("hidden", !["ui", "adb"].includes(form.mode.value));
+        document.getElementById("openUrlOnDevice").parentElement.classList.toggle("hidden", !["ui", "adb"].includes(form.mode.value));
+        showSmartTip("");
+        syncDeviceContext();
+        document.getElementById("collectPreflight").classList.add("hidden");
+        if (activeWorkbenchView === "collect") { resetDetail(); setStatus("准备采集", "填写参数后，先检查条件或直接开始。"); }
+      }
+
+      function updateCollectionMode() {
+        const mode = collectionMode.value;
+        form.mode.value = mode;
+        document.getElementById("phonePreview").classList.toggle("hidden", mode !== "adb");
+        document.getElementById("openUrlOnDevice").parentElement.classList.toggle("hidden", mode !== "adb");
+        form.serial.parentElement.classList.toggle("hidden", mode !== "adb");
+        const savedPage = mode === "search";
+        const platform = presets[currentTask].title.split("商品")[0].split("搜索")[0];
+        document.getElementById("formTitle").textContent = `${platform}采集`;
+        document.getElementById("formDesc").textContent = savedPage
+          ? "从已保存的网页中提取数据，不需要连接手机。"
+          : mode === "adb" ? "在已连接的手机 APP 中搜索并采集可见商品。" : "使用浏览器搜索并读取页面中可见的数据。";
+        document.getElementById("queryLabel").textContent = savedPage ? "已保存的 HTML 文件路径" : "搜索关键词";
+        form.query.placeholder = savedPage ? "例如 D:\\saved_pages\\search.html" : "例如 眼油、运动鞋";
+        document.getElementById("queryHelp").textContent = savedPage
+          ? "在浏览器中打开结果页，保存为网页后填写 .html 文件路径。"
+          : mode === "adb" ? "先确认手机已连接、对应 APP 已登录，再输入关键词。" : "浏览器采集需要已安装对应组件；遇到登录或验证要求时请正常完成。";
+        syncDeviceContext();
+      }
+
+      collectionMode.addEventListener("change", () => {
+        updateCollectionMode();
+        if (restoredPayload) {
+          restoredPayload.checkEvidence = ["ui", "adb", "browser"].includes(collectionMode.value);
+        }
+      });
+
+      function payloadFromForm() {
+        const data = new FormData(form);
+        const quality = data.get("quality");
+        return {
+          ...(restoredPayload || {}),
+          platform: data.get("platform"),
+          mode: data.get("mode"),
+          taskType: data.get("taskType"),
+          query: data.get("query"),
+          serial: data.get("serial"),
+          limit: Number(data.get("limit") || 1),
+          maxPages: Number(data.get("maxPages") || 1),
+          maxComments: Number(data.get("maxComments") || 0),
+          minContents: restoredPayload?.minContents ?? 1,
+          minComments: restoredPayload?.minComments ?? 0,
+          strictComments: quality === "comments",
+          formats: restoredPayload?.formats || "excel,jsonl,report",
+          comments: currentTask === "shop" ? false : data.get("comments") === "on",
+          resume: restoredPayload?.resume ?? false,
+          checkEvidence: restoredPayload?.checkEvidence ?? ["ui", "adb", "browser"].includes(data.get("mode")),
+          batchLinks: restoredPayload?.batchLinks ?? currentTask === "batch"
+        };
+      }
+
+      function setStatus(state, text) {
+        const title = document.getElementById("statusTitle");
+        const body = document.getElementById("statusText");
+        title.textContent = state;
+        body.textContent = text;
+      }
+
+      function setMetrics(result) {
+        const productPlatforms = ["taobao", "tmall", "jd", "jingdong", "pdd", "pinduoduo", "1688", "ali1688", "dewu", "poizon"];
+        const platform = result?.platform || form.platform.value;
+        const productTask = (result?.taskType || form.taskType.value) === "products" || productPlatforms.includes(platform);
+        document.getElementById("mContentsLabel").textContent = productTask
+          ? "商品" : ["xhs", "xiaohongshu"].includes(platform) ? "笔记" : platform === "douyin" ? "视频" : "内容";
+        document.getElementById("mContents").textContent = result?.counts?.contents ?? 0;
+        document.getElementById("mComments").textContent = result?.counts?.comments ?? 0;
+        const ok = document.getElementById("mOk");
+        const quality = result?.quality || {};
+        const status = quality.status || (result?.ok ? "ok" : "failed");
+        ok.textContent = quality.label || (result?.ok ? "可用" : "失败");
+        ok.style.color = status === "ok" ? "var(--green)" : status === "warning" ? "var(--orange)" : "var(--danger)";
+        document.getElementById("mFiles").textContent = Object.keys(result?.downloadLinks || {}).length;
+      }
+
+      function qualityMessage(result) {
+        if (result?.source === "scraper") return "旧任务记录已载入，可在下方查看已保存的数据和文件。";
+        if (result?.source === "video") return result.downloadLinks && Object.keys(result.downloadLinks).length ? "文件已保存，可在下方下载。" : "视频信息已解析，可前往视频下载继续处理。";
+        const quality = result?.quality;
+        if (!quality) {
+          return result?.ok ? "下一步：下载 Excel 数据表，或在下方最近任务里稍后再打开。" : "请查看详细日志。";
+        }
+        if (quality.warnings?.length) {
+          return quality.warnings.join(" ");
+        }
+        if (quality.status === "ok") {
+          return "数据可用。下一步：先查看表格，再决定是否下载 Excel 或其他格式。";
+        }
+        return "采集失败，请查看详细日志或先打开到手机确认后重试。";
+      }
+
+      function renderLinks(result) {
+        const names = {
+          excel: "Excel 数据表",
+          jsonl: "JSONL 原始数据",
+          report: "采集报告",
+          validation_json: "校验数据",
+          validation_markdown: "校验报告"
+        };
+        const entries = Object.entries(result.downloadLinks || {});
+        links.innerHTML = "";
+        if (!entries.length) {
+          links.innerHTML = '<div class="empty">没有可下载文件。</div>';
+          return;
+        }
+        const excel = entries.find(([name]) => name === "excel");
+        const others = entries.filter(([name]) => name !== "excel");
+        const wrapper = document.createElement("div");
+        wrapper.className = "export-actions";
+        if (excel) {
+          wrapper.appendChild(exportLink(excel[0], excel[1], names));
+        }
+        if (!excel) {
+          others.forEach(([name, href]) => wrapper.appendChild(exportLink(name, href, names)));
+        } else if (others.length) {
+          const button = document.createElement("button");
+          button.className = "secondary-wide";
+          button.type = "button";
+          button.textContent = "显示其他导出格式";
+          const otherBox = document.createElement("div");
+          otherBox.className = "other-exports";
+          others.forEach(([name, href]) => otherBox.appendChild(exportLink(name, href, names)));
+          button.addEventListener("click", () => {
+            otherBox.classList.toggle("show");
+            button.textContent = otherBox.classList.contains("show") ? "隐藏其他导出格式" : "显示其他导出格式";
+          });
+          wrapper.appendChild(button);
+          wrapper.appendChild(otherBox);
+        }
+        links.appendChild(wrapper);
+      }
+
+      function exportLink(name, href, names) {
+        const a = document.createElement("a");
+        a.href = href;
+        a.textContent = names[name] || name;
+        const arrow = document.createElement("span");
+        arrow.textContent = "下载";
+        a.appendChild(arrow);
+        return a;
+      }
+
+      function renderPreview(result) {
+        const contents = result?.preview?.contents || [];
+        const comments = result?.preview?.comments || [];
+        previewList.innerHTML = "";
+        if (!contents.length && !comments.length && result?.metadata) {
+          const detail = document.createElement("div");
+          detail.className = "video-metadata";
+          detail.textContent = formatVideoMetadata(result.metadata);
+          previewList.appendChild(detail);
+          return;
+        }
+        if (!contents.length && !comments.length) {
+          previewList.innerHTML = '<div class="empty">没有可显示的数据。</div>';
+          return;
+        }
+        if (contents.some((item) => item.productTitle || item.productPrice || item.productPayCount || item.productShopName)) {
+          const productRows = contents.map((item) => `
+            <tr>
+              <td class="data-title">${escapeHtml(item.productTitle || item.title || "未识别商品名")}</td>
+              <td>${escapeHtml(item.productPrice || "-")}</td>
+              <td>${escapeHtml(item.productOriginalPrice || "-")}</td>
+              <td>${escapeHtml(item.productPayCount || "-")}</td>
+              <td>${escapeHtml(item.productShopName || "-")}</td>
+              <td>${escapeHtml(item.sourceUrl || "-")}</td>
+            </tr>
+          `).join("");
+          previewList.innerHTML = `
+            <div class="data-table-wrap">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>商品名</th>
+                    <th>售价</th>
+                    <th>原价</th>
+                    <th>销量/付款</th>
+                    <th>店铺</th>
+                    <th>来源</th>
+                  </tr>
+                </thead>
+                <tbody>${productRows}</tbody>
+              </table>
+            </div>
+          `;
+          return;
+        }
+        const contentRows = contents.map((item) => `
+          <tr>
+            <td class="data-title">${escapeHtml(item.title || "未识别标题")}</td>
+            <td>${escapeHtml(item.author || "-")}</td>
+            <td>${escapeHtml(item.likes || "-")}</td>
+            <td>${escapeHtml(item.comments || "-")}</td>
+            <td>${escapeHtml(item.favorites || "-")}</td>
+            <td>${escapeHtml(item.shares || "-")}</td>
+          </tr>
+        `).join("");
+        const commentRows = comments.slice(0, 5).map((item) => `
+          <tr>
+            <td class="data-title">${escapeHtml(item.text || "空评论")}</td>
+            <td>${escapeHtml(item.author || "-")}</td>
+            <td>${escapeHtml(item.likes || "-")}</td>
+            <td>-</td>
+            <td>-</td>
+            <td>-</td>
+          </tr>
+        `).join("");
+        previewList.innerHTML = `
+          <div class="data-table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>内容/评论</th>
+                  <th>作者</th>
+                  <th>点赞</th>
+                  <th>评论</th>
+                  <th>收藏</th>
+                  <th>分享</th>
+                </tr>
+              </thead>
+              <tbody>${contentRows}${commentRows}</tbody>
+            </table>
+          </div>
+        `;
+      }
+
+      function applyPayloadToForm(payload) {
+        const platform = String(payload.platform || "").toLowerCase();
+        const names = { taobao: "taobao", tmall: "taobao", jd: "jd", jingdong: "jd", xiaohongshu: "xhs", xhs: "xhs", pinduoduo: "pdd", pdd: "pdd", "1688": "ali1688", ali1688: "ali1688", dewu: "dewu", poizon: "dewu" };
+        if (names[platform]) {
+          setTask(names[platform]);
+        } else if (payload.batchLinks) {
+          setTask("batch");
+        } else if (payload.taskType === "products") {
+          setTask("shop");
+        } else if (payload.platform === "generic_web") {
+          setTask("web");
+        } else if (payload.taskType === "keyword") {
+          setTask("keyword");
+        } else {
+          setTask("video");
+        }
+        if (payload.mode && [...collectionMode.options].some((option) => option.value === payload.mode)) {
+          collectionMode.value = payload.mode;
+          updateCollectionMode();
+        }
+        form.platform.value = payload.platform || form.platform.value;
+        form.mode.value = payload.mode || form.mode.value;
+        form.taskType.value = payload.taskType || form.taskType.value;
+        form.quality.value = payload.strictComments ? "comments" : "normal";
+        form.query.value = payload.query || "";
+        form.serial.value = payload.serial || "";
+        form.limit.value = payload.limit || 1;
+        form.maxPages.value = payload.maxPages || 1;
+        form.maxComments.value = payload.maxComments ?? 5;
+        form.comments.checked = Boolean(payload.comments ?? true);
+        restoredPayload = { ...payload };
+      }
+
+      function readablePlatform(value) {
+        return { douyin: "抖音", taobao: "淘宝", tmall: "天猫", jd: "京东", xiaohongshu: "小红书", pinduoduo: "拼多多", "1688": "1688", dewu: "得物", generic_web: "公开网页", sample: "本地样例" }[value] || value || "任务";
+      }
+
+      function readableTask(value) {
+        const modules = { media_parse: "解析信息", media_download: "视频下载", saved_media: "本地媒体文件", merchant: "商家后台", competitor: "竞品采集", crawler: "商品采集", media: "媒体采集", product: "商品" };
+        if (modules[value]) return modules[value];
+        if (value === "keyword") return "关键词";
+        if (value === "content") return "单条内容";
+        if (value === "comments") return "评论";
+        if (value === "products") return "商品";
+        return value || "任务";
+      }
+
+      function escapeHtml(value) {
+        return String(value ?? "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
+      function formatBytes(value) {
+        const size = Number(value || 0);
+        if (!size) return "大小未知";
+        if (size < 1024 * 1024) return `${Math.round(size / 1024)} KB`;
+        return `${(size / 1024 / 1024).toFixed(1)} MB`;
+      }
+
+      async function loadVideoHelper() {
+        videoHelperStatus.textContent = "正在读取插件状态...";
+        try {
+          const response = await fetch("/api/video-helper/status");
+          const data = await response.json();
+          renderVideoHelper(data);
+        } catch (error) {
+          videoHelperStatus.textContent = "插件状态读取失败，请确认本地服务是否运行。";
+          videoHelperItems.innerHTML = '<div class="empty">暂时没有可下载的视频。</div>';
+        }
+      }
+
+      function renderVideoHelper(data) {
+        const items = data.items || [];
+        const stateText = data.running ? "已连接" : "未启动";
+        const title = data.pageTitle || "暂无页面标题";
+        videoHelperStatus.innerHTML = `
+          <strong>${escapeHtml(stateText)}</strong> · 最近捕获 ${items.length} 条<br>
+          ${escapeHtml(title)}<br>
+          <span>保存目录：${escapeHtml(data.exportsDir || "-")}</span>
+        `;
+        videoHelperItems.innerHTML = "";
+        if (!items.length) {
+          videoHelperItems.innerHTML = '<div class="empty">还没有捕获到视频。请先打开抖音网页版，播放视频后再刷新。</div>';
+          return;
+        }
+        items.slice(0, 6).forEach((item) => {
+          const row = document.createElement("div");
+          row.className = "helper-item";
+          const titleText = item.videoTitle || item.pageTitle || "捕获到的视频";
+          const typeText = item.kind || item.contentType || "媒体";
+          row.innerHTML = `
+            <div class="helper-title">${escapeHtml(titleText)}</div>
+            <div class="helper-meta">${escapeHtml(typeText)} · ${escapeHtml(formatBytes(item.contentLength))}</div>
+            <div class="helper-meta">${escapeHtml(item.url)}</div>
+            <button class="mini-button download-captured" type="button">下载这条视频</button>
+          `;
+          row.querySelector(".download-captured").addEventListener("click", () => downloadCapturedVideo(item.index));
+          videoHelperItems.appendChild(row);
+        });
+      }
+
+      async function startVideoHelperService() {
+        videoHelperStatus.textContent = "正在启动视频下载助手...";
+        try {
+          const response = await fetch("/api/video-helper/start", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({})
+          });
+          const data = await response.json();
+          renderVideoHelper(data);
+        } catch (error) {
+          videoHelperStatus.textContent = "启动失败，请检查插件目录是否还在 D 盘。";
+        }
+      }
+
+      async function downloadCapturedVideo(index) {
+        videoHelperStatus.textContent = "正在下载捕获到的视频...";
+        try {
+          const response = await fetch("/api/video-helper/download", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ index })
+          });
+          const data = await response.json();
+          if (!data.ok && data.message) {
+            videoHelperStatus.textContent = data.message;
+            return;
+          }
+          renderVideoHelper(data.status || data);
+          videoHelperStatus.innerHTML += "<br><strong>下载任务已提交，文件会保存到上面的目录。</strong>";
+        } catch (error) {
+          videoHelperStatus.textContent = "下载失败，请确认插件服务已启动，并且视频没有加密限制。";
+        }
+      }
+
+      async function openVideoHelperFolder() {
+        try {
+          await fetch("/api/video-helper/open-folder", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({})
+          });
+        } catch (error) {
+          videoHelperStatus.textContent = "打开目录失败，请检查导出目录是否存在。";
+        }
+      }
+
+      historyPrev.addEventListener("click", () => loadHistory(historyPage - 1));
+      historyNext.addEventListener("click", () => loadHistory(historyPage + 1));
+
+      async function loadDevice() {
+        deviceText.textContent = "正在检测设备";
+        try {
+          const response = await fetch("/api/device");
+          const data = await response.json();
+          const count = (data.devices || []).filter((item) => item.state === "device").length;
+          deviceText.textContent = data.ok ? `设备可用：${data.selectedSerial}` : data.message;
+          const service = document.querySelector(".service");
+          let detail = service.querySelector(".device-detail");
+          if (!detail) {
+            detail = document.createElement("div");
+            detail.className = "device-detail";
+            service.appendChild(detail);
+          }
+          detail.textContent = `已连接设备：${count} 台。${data.message}`;
+        } catch {
+          deviceText.textContent = "设备检测失败";
+        }
+      }
+
+      async function health() {
+        try {
+          const response = await fetch("/api/health");
+          const data = await response.json();
+          document.getElementById("health").textContent = data.ok ? "服务已启动" : "服务异常";
+        } catch {
+          document.getElementById("health").textContent = "服务未连接";
+          deviceText.textContent = "服务未连接";
+        }
+      }
+
+      taskCards.forEach((card) => card.addEventListener("click", () => setTask(card.dataset.task)));
+
+      form.query.addEventListener("input", () => {
+        const value = form.query.value;
+        const linkCount = countLinks(value);
+        if (currentTask === "video" && linkCount > 1) {
+          setTask("batch");
+          form.query.value = value;
+          showSmartTip(`检测到 ${linkCount} 条链接，已自动切换到批量采集。`);
+          return;
+        }
+        if (currentTask === "batch" && linkCount > 1) {
+          showSmartTip(`检测到 ${linkCount} 条链接，将按批量任务逐条采集。`);
+          return;
+        }
+        if ((currentTask === "video" || currentTask === "batch") && value.includes("modal_id=")) {
+          showSmartTip("检测到 douyin.com 视频链接，软件会自动转换成 APP 可打开的形式。");
+          return;
+        }
+        showSmartTip("");
+      });
+
+      function countLinks(value) {
+        const matches = value.match(/https?:\/\/\S+/g);
+        if (!matches) return 0;
+        return new Set(matches.map((item) => item.replace(/[，,。；;]+$/, ""))).size;
+      }
+
+      function showSmartTip(text) {
+        smartTip.textContent = text;
+        smartTip.classList.toggle("show", Boolean(text));
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        await submitPayload(payloadFromForm());
+      });
+
+      async function submitPayload(payload) { return submitTask("collect", payload); }
+
+      document.getElementById("refreshDevice").addEventListener("click", () => checkSelectedTask("collect"));
+      document.getElementById("refreshScreen").addEventListener("click", refreshPhoneScreen);
+      phoneScreen.addEventListener("click", tapPhoneScreen);
+      document.getElementById("openMirror").addEventListener("click", openNativeMirror);
+      document.getElementById("openUrlOnDevice").addEventListener("click", openUrlOnDevice);
+      document.getElementById("refreshVideoHelper").addEventListener("click", loadVideoHelper);
+      document.getElementById("startVideoHelper").addEventListener("click", startVideoHelperService);
+      document.getElementById("openVideoFolder").addEventListener("click", openVideoHelperFolder);
+      toggleLive.addEventListener("click", () => {
+        if (liveTimer) {
+          clearInterval(liveTimer);
+          liveTimer = null;
+          toggleLive.textContent = "开始实时";
+          phoneNote.textContent = "实时预览已暂停。";
+          return;
+        }
+        refreshPhoneScreen();
+        liveTimer = setInterval(refreshPhoneScreen, 1000);
+        toggleLive.textContent = "暂停实时";
+        phoneNote.textContent = "实时预览中，约每秒刷新一次。";
+      });
+
+      async function refreshPhoneScreen() {
+        const url = `/api/device/screenshot?t=${Date.now()}`;
+        try {
+          const response = await fetch(url, { cache: "no-store" });
+          if (!response.ok) {
+            throw new Error("截图失败");
+          }
+          const blob = await response.blob();
+          const objectUrl = URL.createObjectURL(blob);
+          const oldUrl = phoneScreen.dataset.objectUrl;
+          phoneScreen.onload = () => {
+            if (oldUrl) URL.revokeObjectURL(oldUrl);
+          };
+          phoneScreen.dataset.objectUrl = objectUrl;
+          phoneScreen.src = objectUrl;
+          phoneScreen.classList.remove("hidden");
+          phoneEmpty.classList.add("hidden");
+        } catch (error) {
+          phoneScreen.classList.add("hidden");
+          phoneEmpty.classList.remove("hidden");
+          phoneEmpty.textContent = "手机画面获取失败，请检查设备连接。";
+          phoneNote.textContent = String(error.message || error);
+        }
+      }
+
+      async function tapPhoneScreen(event) {
+        if (!phoneScreen.naturalWidth || !phoneScreen.naturalHeight) {
+          return;
+        }
+        const rect = phoneScreen.getBoundingClientRect();
+        const x = Math.round(((event.clientX - rect.left) / rect.width) * phoneScreen.naturalWidth);
+        const y = Math.round(((event.clientY - rect.top) / rect.height) * phoneScreen.naturalHeight);
+        phoneNote.textContent = `正在点击手机坐标：${x}, ${y}`;
+        try {
+          const response = await fetch("/api/device/tap", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ x, y })
+          });
+          const result = await response.json();
+          phoneNote.textContent = result.ok ? `已点击：${x}, ${y}` : (result.message || "点击失败");
+          setTimeout(refreshPhoneScreen, 500);
+        } catch (error) {
+          phoneNote.textContent = "点击失败，请检查设备连接。";
+        }
+      }
+
+      async function openNativeMirror() {
+        phoneNote.textContent = "正在打开原生投屏窗口...";
+        try {
+          const response = await fetch("/api/device/mirror", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({})
+          });
+          const result = await response.json();
+          phoneNote.textContent = result.message || (result.ok ? "已打开原生投屏窗口。" : "原生投屏打开失败。");
+        } catch (error) {
+          phoneNote.textContent = "原生投屏打开失败，请检查 scrcpy 是否安装。";
+        }
+      }
+
+      async function openUrlOnDevice() {
+        const url = form.query.value.trim();
+        if (!url) {
+          showSmartTip("请先粘贴视频链接。");
+          return;
+        }
+        setStatus("正在打开视频", "正在把链接发送到手机，请稍等并观察手机画面。");
+        phoneNote.textContent = "正在打开视频链接...";
+        try {
+          const response = await fetch("/api/device/open-url", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url, serial: form.serial.value })
+          });
+          const result = await response.json();
+          showSmartTip(result.message || "已发送到手机。");
+          phoneNote.textContent = result.message || "已发送到手机。";
+          setTimeout(refreshPhoneScreen, 1800);
+        } catch (error) {
+          showSmartTip("打开链接失败，请检查设备连接。");
+          phoneNote.textContent = "打开链接失败，请检查设备连接。";
+        }
+      }
+
+    </script>
+    <script src="/workbench_tasks.js?v=601b0804ba75"></script>
+  </body>
+</html>

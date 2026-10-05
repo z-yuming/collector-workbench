@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>视频下载助手</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <main class="app">
+    <header class="compact-header">
+      <div class="title-row">
+        <strong class="app-title">视频下载助手</strong>
+        <span id="page-meta" class="page-chip">读取页面...</span>
+      </div>
+      <div class="menu-bar">
+        <button id="refresh-btn" class="tool-button">刷新</button>
+        <button id="clear-btn" class="tool-button">清空</button>
+        <label class="mini-toggle">
+          <input id="primary-only-toggle" type="checkbox" checked>
+          <span class="mini-toggle-ui"></span>
+          <span>主视频</span>
+        </label>
+        <span class="count-pill">视频 <strong id="item-count">0</strong></span>
+        <span class="count-pill">任务 <strong id="job-count">0</strong></span>
+      </div>
+      <p id="filter-meta" class="filter-note">优先隐藏 logo、预览、碎片等杂项</p>
+    </header>
+
+    <section id="jobs" class="jobs"></section>
+    <section id="featured" class="featured"></section>
+    <section id="items" class="list"></section>
+    <section id="recent-downloads" class="recent"></section>
+  </main>
+  <script src="popup.js"></script>
+</body>
+</html>

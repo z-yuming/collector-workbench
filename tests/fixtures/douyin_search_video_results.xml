@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hierarchy rotation="0">
+  <node index="0" text="" content-desc="" resource-id="" class="android.widget.FrameLayout" bounds="[0,0][1080,2400]">
+    <node index="1" text="nike" content-desc="" resource-id="com.ss.android.ugc.aweme:id/et_search_kw" class="android.widget.EditText" bounds="[132,97][754,217]" />
+    <node index="2" text="综合" content-desc="" resource-id="android:id/text1" class="android.widget.Button" bounds="[82,264][172,325]" />
+    <node index="3" text="视频" content-desc="" resource-id="android:id/text1" class="android.widget.Button" bounds="[240,264][330,325]" />
+    <node index="4" text="商品" content-desc="" resource-id="android:id/text1" class="android.widget.Button" bounds="[556,264][646,325]" />
+    <node index="5" text="Nike ACG重新回山野，但真正值得买的只有～ #ACG #越野跑 #跑鞋测评" content-desc="" resource-id="com.ss.android.ugc.aweme:id/desc" class="android.widget.TextView" bounds="[36,1240][510,1361]" />
+    <node index="6" text="浩浩然299" content-desc="" resource-id="com.ss.android.ugc.aweme:id/+j" class="android.widget.TextView" bounds="[120,1385][276,1429]" />
+    <node index="7" text="06.25" content-desc="" resource-id="com.ss.android.ugc.aweme:id/3+4" class="android.widget.TextView" bounds="[120,1429][186,1466]" />
+    <node index="8" text="398" content-desc="" resource-id="com.ss.android.ugc.aweme:id/n_=" class="android.widget.TextView" bounds="[447,1402][510,1448]" />
+    <node index="9" text="618耐克选鞋攻略！ #跑鞋#新鞋到了#耐克#鞋狗的日常 #运动帮帮团" content-desc="" resource-id="com.ss.android.ugc.aweme:id/desc" class="android.widget.TextView" bounds="[570,1240][1044,1361]" />
+    <node index="10" text="葉子在跑了" content-desc="" resource-id="com.ss.android.ugc.aweme:id/+j" class="android.widget.TextView" bounds="[654,1385][819,1429]" />
+    <node index="11" text="05.14" content-desc="" resource-id="com.ss.android.ugc.aweme:id/3+4" class="android.widget.TextView" bounds="[654,1429][720,1466]" />
+    <node index="12" text="739" content-desc="" resource-id="com.ss.android.ugc.aweme:id/n_=" class="android.widget.TextView" bounds="[981,1402][1044,1448]" />
+  </node>
+</hierarchy>

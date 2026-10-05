@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<hierarchy rotation="0">
+  <node index="0" text="" content-desc="" resource-id="" class="android.widget.FrameLayout" bounds="[0,0][1080,2400]">
+    <node index="1" text="未点赞，喜欢9800，按钮" content-desc="" resource-id="" class="android.widget.Button" bounds="[960,820][1050,900]" />
+    <node index="2" text="评论76，按钮" content-desc="" resource-id="" class="android.widget.Button" bounds="[960,930][1050,1010]" />
+    <node index="3" text="未选中，收藏2263，按钮" content-desc="" resource-id="" class="android.widget.Button" bounds="[960,1040][1050,1120]" />
+    <node index="4" text="分享4018，按钮" content-desc="" resource-id="" class="android.widget.Button" bounds="[960,1150][1050,1230]" />
+    <node index="5" text="@sample_author" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1400][500,1460]" />
+    <node index="6" text="公开视频标题 #nike" content-desc="" resource-id="" class="android.widget.TextView" bounds="[40,1470][900,1540]" />
+  </node>
+</hierarchy>
